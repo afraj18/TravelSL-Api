@@ -2,17 +2,28 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 require('dotenv').config();
-
+//Routers
+const userRouter = require('./routes/userRoute')
 // ModelImports
 const User = require('./models/user');
 
 const app = express();
 
+app.use(express.json());
+app.use(userRouter)
+//Http Req
+app.get('/',(req,res)=>{
+    res.send("Hello server Good Night");
+})
+
+
+
+
+
 //DbConnect
 mongoose.connect(process.env.MONGO_URL,{
     useNewUrlParser:true,
     useUnifiedTopology:true,
-
 })
 .then(()=>{
     console.log("Db Connected")
@@ -20,26 +31,6 @@ mongoose.connect(process.env.MONGO_URL,{
 .catch(e=>{
     console.log(e.message)
 });
-
-
-//Http Req
-app.get('/',(req,res)=>{
-    res.send("Hello server Good Night");
-})
-
-app.post('/create-user',async (req,res)=>{
-    const isNewUser = await User.isThisEmailInUse("Abcd12345@gmail.com");
-    if(!isNewUser){
-        return res.json({
-            success: false,
-            message:'This email is already in use, Try sign in'});
-    }
-   const user =  await User({fullName: "Afraj",email:"Abcd12345@gmail.com",password:"12345"})
-   user.save();
-   res.json(user);
-})
-
-
 
 //PortConnection
 app.listen(8000,()=>{
